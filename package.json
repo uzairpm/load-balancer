@@ -1,0 +1,25 @@
+{
+  "name": "load-balancer",
+  "version": "1.0.0",
+  "description": "application level load balancer",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon loadbalancer.ts",
+    "server": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "application",
+    "load",
+    "balancer"
+  ],
+  "author": "uzairpm@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
