@@ -3,20 +3,43 @@ const express = require('express');
 const app = express();
 const port = 80;
 
-const server1Url = 'http://localhost:8080/';
-const server2Url = 'http://localhost:8081/';
-const server3Url = 'http://localhost:8082/';
 
 // let serverIdx = 0;
-let servers: any[] = [server1Url, server2Url, server3Url];
+const masterServersList: any[] = ['http://localhost:8080/', 'http://localhost:8081/', 'http://localhost:8082/'];
+let servers = [...masterServersList];
 
 function getServerUrl(): string {
     // lets go round robin for now
     const chosen: any = servers.pop();
     servers.unshift(chosen);
-    console.log(chosen);
+    console.log('Chosen server', chosen);
     return chosen;
 }
+
+function performPeriodicHealthChecks() {
+    // perform health check every 5 seconds
+    servers = [...masterServersList];
+    masterServersList.forEach(async (srv, idx) => {
+        try {
+            const url = srv + 'health';
+            const response = await nodefetch(url);
+
+            if (response && response.status === 200) {
+                console.log(`Server ${srv} is up and running`);
+            } else {
+                console.log(`Server ${srv} is down`);
+                servers = servers.filter(it => it !== srv);
+            }
+        } catch (err) {
+            console.log(`Server ${srv} is down`);
+            servers = servers.filter(it => it !== srv);
+        }
+    });
+}
+
+setInterval(() => {
+    performPeriodicHealthChecks();
+}, 5000);
 
 app.get('/', async (req: any, res: any) => {
     const timeReceived = new Date().toISOString();
@@ -39,7 +62,7 @@ app.get('/', async (req: any, res: any) => {
 
 app.get('/health', (req: any, res: any) => {
     const timeReceived = new Date().toISOString();
-    console.log(`Request received at ${timeReceived}`);
+    console.log(`Health check received at ${timeReceived}`);
     res.send(`Load balancer is up and running ${timeReceived}`);
 });
 

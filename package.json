@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon loadbalancer.ts",
-    "server": "node server",
+    "server": "nodemon server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "application",
     "load",
-    "balancer"
+    "balancer",
+    "layer 7"
   ],
   "author": "uzairpm@gmail.com",
   "license": "ISC",

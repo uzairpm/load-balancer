@@ -11,6 +11,12 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/health', (req, res) => {
+    const timeReceived = new Date().toISOString();
+    console.log(`Health check received at ${timeReceived}`);
+    res.status(200).send(`${serverName} is up and running ${timeReceived}`);
+});
+
 app.listen(port, () => {
     console.log(`${serverName} listening on port ${port}`)
 });
