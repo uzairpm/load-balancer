@@ -1,7 +1,9 @@
 const nodefetch = require('node-fetch');
+var colors = require('colors');
 const express = require('express');
 const app = express();
-const port = 80;
+const PORT = 80;
+const HEALTH_CHECK_INTERVAL = 5000;
 
 
 // let serverIdx = 0;
@@ -25,13 +27,13 @@ function performPeriodicHealthChecks() {
             const response = await nodefetch(url);
 
             if (response && response.status === 200) {
-                console.log(`Server ${srv} is up and running`);
+                console.log(colors.green(`Server ${srv} is up and running`));
             } else {
-                console.log(`Server ${srv} is down`);
+                console.log(colors.red(`Server ${srv} is down`));
                 servers = servers.filter(it => it !== srv);
             }
         } catch (err) {
-            console.log(`Server ${srv} is down`);
+            console.log(colors.red(`Server ${srv} is down`));
             servers = servers.filter(it => it !== srv);
         }
     });
@@ -39,7 +41,7 @@ function performPeriodicHealthChecks() {
 
 setInterval(() => {
     performPeriodicHealthChecks();
-}, 5000);
+}, HEALTH_CHECK_INTERVAL);
 
 app.get('/', async (req: any, res: any) => {
     const timeReceived = new Date().toISOString();
@@ -49,7 +51,6 @@ app.get('/', async (req: any, res: any) => {
         const serverUrl = getServerUrl();
         const response = await nodefetch(serverUrl);
         const data = await response.json();
-        // const jsonString = JSON.stringify(data);
         res.json({
             lbMsg: `Load balancer at ${timeReceived}`,
             data
@@ -66,6 +67,6 @@ app.get('/health', (req: any, res: any) => {
     res.send(`Load balancer is up and running ${timeReceived}`);
 });
 
-app.listen(port, () => {
-    console.log(`Load balancer listening on port ${port}`)
+app.listen(PORT, () => {
+    console.log(`Load balancer listening on port ${PORT}`);
 });
